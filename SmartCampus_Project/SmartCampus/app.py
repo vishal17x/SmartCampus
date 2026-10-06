@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+
+import os
 import sqlite3
 from pathlib import Path
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "smart-campus-demo-key"
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret")
 DB = Path(__file__).with_name("database.db")
 
 def get_db():
@@ -32,10 +33,24 @@ def init_db():
         created_at TEXT NOT NULL,
         FOREIGN KEY(student_id) REFERENCES users(id)
     )""")
-    admin = conn.execute("SELECT id FROM users WHERE email=?", ("admin@smartcampus.com",)).fetchone()
-    if not admin:
-        conn.execute("INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)",
-                     ("Administrator", "admin@smartcampus.com", "admin123", "admin"))
+    admin_email = os.environ.get("ADMIN_EMAIL")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+
+    if admin_email and admin_password:
+        admin = conn.execute(
+            "SELECT id FROM users WHERE role='admin' ORDER BY id LIMIT 1"
+        ).fetchone()
+
+        if admin:
+            conn.execute(
+                "UPDATE users SET name=?, email=?, password=? WHERE id=?",
+                ("Administrator", admin_email, admin_password, admin["id"])
+            )
+        else:
+            conn.execute(
+                "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)",
+                ("Administrator", admin_email, admin_password, "admin")
+            )
     conn.commit()
     conn.close()
 
