@@ -39,6 +39,9 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Initialize the database when Gunicorn/Render starts the app
+init_db()
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -133,5 +136,4 @@ def update_status(complaint_id):
     return redirect(url_for("admin"))
 
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
