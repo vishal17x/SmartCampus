@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% block title %}SmartCampus{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="tag">SMART COLLEGE SOLUTION</span>
+    <h1>Report campus problems.<br><span>Track every solution.</span></h1>
+    <p>A simple digital platform for students to submit complaints and administrators to manage them efficiently.</p>
+    <div class="actions">
+      <a class="btn" href="{{ url_for('login') }}">Get Started →</a>
+      <a class="btn secondary" href="{{ url_for('register') }}">Create Account</a>
+    </div>
+  </div>
+  <div class="hero-card">
+    <div class="icon">🛠️</div>
+    <h3>One place for campus issues</h3>
+    <p>Submit • Track • Resolve</p>
+  </div>
+</section>
+<section class="features">
+  <div><b>📝 Easy Reporting</b><p>Submit a complaint with category and location.</p></div>
+  <div><b>🔎 Live Tracking</b><p>Know whether your complaint is pending, in progress or resolved.</p></div>
+  <div><b>📊 Admin Control</b><p>Administrators can manage and update complaints.</p></div>
+</section>
+{% endblock %}

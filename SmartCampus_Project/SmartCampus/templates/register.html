@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Register{% endblock %}
+{% block content %}
+<div class="form-wrap">
+<h2>Create Student Account</h2><p>Join SmartCampus</p>
+<form method="POST">
+<label>Full Name</label><input name="name" required>
+<label>Email</label><input type="email" name="email" required>
+<label>Password</label><input type="password" name="password" required minlength="4">
+<button class="btn full">Register</button>
+</form>
+<p>Already registered? <a href="{{ url_for('login') }}">Login</a></p>
+</div>
+{% endblock %}

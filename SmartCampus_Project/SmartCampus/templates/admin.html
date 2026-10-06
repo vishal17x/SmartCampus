@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="tag">ADMIN PORTAL</span><h1>Complaint Management</h1><p>Review and update student complaints.</p></div></div>
+<div class="stats">
+<div><span>Total</span><strong>{{ total }}</strong></div>
+<div><span>Pending</span><strong>{{ pending }}</strong></div>
+<div><span>In Progress</span><strong>{{ progress }}</strong></div>
+<div><span>Resolved</span><strong>{{ resolved }}</strong></div>
+</div>
+<section class="panel table-panel">
+<h2>All Complaints</h2>
+{% if complaints %}
+<div class="table-scroll"><table>
+<thead><tr><th>ID</th><th>Student</th><th>Issue</th><th>Category</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
+{% for c in complaints %}
+<tr><td>#{{c.id}}</td><td>{{c.student_name}}<br><small>{{c.student_email}}</small></td><td><b>{{c.title}}</b><br><small>{{c.description}}</small></td><td>{{c.category}}</td><td>{{c.location}}</td><td><span class="status {{ c.status|lower|replace(' ','-') }}">{{c.status}}</span></td>
+<td><form method="POST" action="{{ url_for('update_status', complaint_id=c.id) }}" class="inline"><select name="status"><option {% if c.status=='Pending' %}selected{% endif %}>Pending</option><option {% if c.status=='In Progress' %}selected{% endif %}>In Progress</option><option {% if c.status=='Resolved' %}selected{% endif %}>Resolved</option></select><button class="small-btn">Update</button></form></td></tr>
+{% endfor %}
+</tbody></table></div>
+{% else %}<div class="empty">No complaints submitted yet.</div>{% endif %}
+</section>
+{% endblock %}

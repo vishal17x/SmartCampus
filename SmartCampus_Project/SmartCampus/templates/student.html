@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="tag">STUDENT PORTAL</span><h1>Hello, {{ session.get('name') }} 👋</h1><p>Report an issue and track your complaints.</p></div></div>
+<div class="grid2">
+<section class="panel">
+<h2>Submit Complaint</h2>
+<form method="POST">
+<label>Category</label>
+<select name="category" required>
+<option value="">Select category</option><option>Classroom</option><option>Laboratory</option><option>Library</option><option>Hostel</option><option>Transport</option><option>Other</option>
+</select>
+<label>Title</label><input name="title" required placeholder="e.g. Projector not working">
+<label>Location</label><input name="location" required placeholder="e.g. Lab 2">
+<label>Description</label><textarea name="description" required placeholder="Describe the issue..."></textarea>
+<button class="btn full">Submit Complaint</button>
+</form>
+</section>
+<section class="panel">
+<h2>My Complaints</h2>
+{% if complaints %}
+<div class="cards">
+{% for c in complaints %}
+<div class="complaint"><div class="row"><b>#{{ c.id }} {{ c.title }}</b><span class="status {{ c.status|lower|replace(' ','-') }}">{{ c.status }}</span></div>
+<p>{{ c.description }}</p><small>{{ c.category }} • {{ c.location }} • {{ c.created_at }}</small></div>
+{% endfor %}
+</div>
+{% else %}<div class="empty">No complaints yet.</div>{% endif %}
+</section>
+</div>
+{% endblock %}
