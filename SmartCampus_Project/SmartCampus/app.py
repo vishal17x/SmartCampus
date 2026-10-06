@@ -9,7 +9,8 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret")
 DB = Path(__file__).with_name("database.db")
 
 def get_db():
-    conn = sqlite3.connect(DB)
+    conn = sqlite3.connect(DB, timeout=30, check_same_thread=False)
+    conn.execute("PRAGMA busy_timeout = 30000")
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -73,16 +74,18 @@ def register():
         name = request.form["name"].strip()
         email = request.form["email"].strip().lower()
         password = request.form["password"]
+        conn = get_db()
         try:
-            conn = get_db()
             conn.execute("INSERT INTO users(name,email,password) VALUES(?,?,?)",
                          (name,email,password))
             conn.commit()
-            conn.close()
             flash("Registration successful. Please login.")
             return redirect(url_for("login"))
         except sqlite3.IntegrityError:
+            conn.rollback()
             flash("Email already registered.")
+        finally:
+            conn.close()
     return render_template("register.html")
 
 @app.route("/login", methods=["GET","POST"])
