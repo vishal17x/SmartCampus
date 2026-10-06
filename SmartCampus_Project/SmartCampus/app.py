@@ -1,5 +1,5 @@
-
 import os
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 from pathlib import Path
 from datetime import datetime
@@ -33,20 +33,26 @@ def init_db():
         created_at TEXT NOT NULL,
         FOREIGN KEY(student_id) REFERENCES users(id)
     )""")
-    admin_email = os.environ.get("ADMIN_EMAIL")
-    admin_password = os.environ.get("ADMIN_PASSWORD")
+    # Create/update the single admin account from Render environment variables.
+    admin_email = os.environ.get("ADMIN_EMAIL", "").strip().lower()
+    admin_password = os.environ.get("ADMIN_PASSWORD", "")
 
     if admin_email and admin_password:
-        admin = conn.execute(
-            "SELECT id FROM users WHERE role='admin' ORDER BY id LIMIT 1"
-        ).fetchone()
+        admins = conn.execute(
+            "SELECT id FROM users WHERE role='admin' ORDER BY id"
+        ).fetchall()
 
-        if admin:
+        if admins:
+            admin_id = admins[0]["id"]
             conn.execute(
                 "UPDATE users SET name=?, email=?, password=? WHERE id=?",
-                ("Administrator", admin_email, admin_password, admin["id"])
+                ("Administrator", admin_email, admin_password, admin_id)
             )
+            # Keep only one admin account.
+            for extra in admins[1:]:
+                conn.execute("DELETE FROM users WHERE id=?", (extra["id"],))
         else:
+            # The chosen admin email must not already belong to a student.
             conn.execute(
                 "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)",
                 ("Administrator", admin_email, admin_password, "admin")
